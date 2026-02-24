@@ -2,13 +2,15 @@ services:
   datomic-storage:
     image: postgres:17
     environment:
-      POSTGRES_USER: datomic
-      POSTGRES_PASSWORD: datomic
-      POSTGRES_DB: datomic
+      POSTGRES_USER: blog
+      POSTGRES_PASSWORD: blog001!
+      POSTGRES_DB: blog
+    volumes:
+      - ./postgres-db.sql:/docker-entrypoint-initdb.d/postgres-db.sql:ro
     ports:
       - "5432:5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U datomic"]
+      test: ["CMD-SHELL", "pg_isready -U blog"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -34,6 +36,10 @@ services:
   clj-blog:
     build: .
     hostname: blog
+    environment:
+      DB_URI: datomic:sql://blog?jdbc:postgresql://datomic-storage:5432/datomic?user=blog&password=blog001%21
+      ADMIN_LOGIN: admin
+      ADMIN_PASSWORD: admin135!
     depends_on:
       datomic-transactor:
         condition: service_healthy
