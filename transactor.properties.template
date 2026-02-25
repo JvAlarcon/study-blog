@@ -1,7 +1,9 @@
 protocol=sql
 host=localhost
 port=4334
-db-uri=jdbc:postgresql://datomic-storage:5432/datomic?user=blog&password=blog001%21
+db-uri=jdbc:postgresql://datomic-storage:5630/datomic?user=blog&password=blog001%21
+sql-driver-class=org.postgresql.Driver
+license-key={put-your-license-here}
 memory-index-threshold=32m
 memory-index-max=256m
 object-cache-max=128m

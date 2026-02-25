@@ -8,7 +8,7 @@ services:
     volumes:
       - ./postgres-db.sql:/docker-entrypoint-initdb.d/postgres-db.sql:ro
     ports:
-      - "5432:5432"
+      - "5630:5630"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U blog"]
       interval: 10s
@@ -16,15 +16,17 @@ services:
       retries: 5
 
   datomic-transactor:
-    image: datomic/datomic-pro
+    build:
+      context: .
+      dockerfile: Dockerfile.transactor
     depends_on:
       datomic-storage:
         condition: service_healthy
     volumes:
-      - ./transactor.properties:/opt/datomic/config/transactor.properties:ro
+      - ./transactor.properties:/opt/datomic/datomic/config/transactor.properties:ro
     ports:
       - "4334:4334"
-    command: ["bin/transactor", "config/transactor.properties"]
+    command: ["config/transactor.properties"]
     healthcheck:
       # Verify if transaction port is accepting connections
       test: ["CMD", "nc", "-z", "localhost", "4334"]
@@ -34,10 +36,12 @@ services:
       start_period: 45s
   
   clj-blog:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile.app
     hostname: blog
     environment:
-      DB_URI: datomic:sql://blog?jdbc:postgresql://datomic-storage:5432/datomic?user=blog&password=blog001%21
+      DB_URI: datomic:sql://blog?jdbc:postgresql://datomic-storage:5630/datomic?user=blog&password=blog001%21
       ADMIN_LOGIN: admin
       ADMIN_PASSWORD: admin135!
     depends_on:

@@ -3,7 +3,7 @@
   :min-lein-version "2.0.0"
   :dependencies [[org.clojure/clojure "1.10.0"]
                  [compojure "1.6.1"]
-                 [ring/ring-default "0.3.2"]
+                 [ring/ring-defaults "0.3.2"]
                  [hiccup "2.0.0"]
                  [markdown-clj "1.12.4"]]
   :pluggins [[lein-ring "0.12.5"]]

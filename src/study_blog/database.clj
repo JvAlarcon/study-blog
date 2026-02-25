@@ -34,7 +34,7 @@
 
 (defn get-article [id]
   (let [db (d/db @conn)]
-    (d/pull db '[:blod/title :blog/body :blog/created-at] id)))
+    (d/pull db '[:blog/title :blog/body :blog/created-at] id)))
 
 (defn update-article [id title body]
   (d/transact @conn [{:blog/id id

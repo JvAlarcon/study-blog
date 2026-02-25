@@ -1,0 +1,19 @@
+FROM eclipse-temurin:17-jre
+
+RUN mkdir -p /opt/datomic
+WORKDIR /opt/datomic
+COPY datomic-pro*.zip ./datomic.zip
+RUN apt-get update && apt-get install -y unzip && \
+    unzip datomic.zip && \
+    DATOMIC_DIR=$(ls -d datomic-pro-*) && \
+    mv "$DATOMIC_DIR" datomic/ && \
+    rm datomic.zip
+
+#RUN ls -la /opt/datomic
+#RUN ls -la /opt/datomic/datomic
+#RUN ls -la /opt/datomic/datomic/bin
+#RUN ls -la /opt/datomic/datomic/config
+
+WORKDIR /opt/datomic/datomic
+EXPOSE 4334 4335 4336
+ENTRYPOINT ["bin/transactor"]
