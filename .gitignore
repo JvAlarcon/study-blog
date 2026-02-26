@@ -13,3 +13,5 @@ pom.xml.asc
 .clj-kondo/
 .lsp/
 datomic-pro-1*.zip
+transactor.properties
+.env

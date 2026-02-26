@@ -13,28 +13,32 @@
        (page/index (db/list-articles)))
   (GET "/articles/:art-id" [art-id]
        (page/article (db/get-article art-id)))
+  (GET "/admin/login" [:as {session :session}]
+       (if (:admin session)
+         (res/redirect "/")
+         (page/admin-login)))
   (POST "/admin/login" [login password]
        (if (adm/validate-login login password)
          (-> (res/redirect "/")
              (assoc-in [:session :admin] true))
          (page/admin-login "Invalid username or password")))
-  (GET "admin/logout" []
+  (GET "/admin/logout" []
        (-> (res/redirect "/")
            (assoc-in [:session :admin] false)))
-  (rout/not-found "Not found"))
+  (route/not-found "Not found")) ; Add default error page instead of not found
 
 (defroutes adm-routes
   (GET "/articles/new" []
        (page/edit-article nil))
   (POST "/articles" [title body]
-        (do (db/create-article title body)
-            (res/redirect "/")))
+        (let [id (db/create-article title body)]
+          (res/redirect (str "/articles/" id))))
   (GET "/articles/:art-id/edit" [art-id]
        (page/edit-article (db/get-article art-id)))
   (POST "/articles/:art-id" [art-id title body]
         (do (db/update-article art-id title body)
-            (res/redirect (str "articles/" art-id))))
-  (DELETE "/articles/:arti-id" [art-id]
+            (res/redirect (str "/articles/" art-id))))
+  (DELETE "/articles/:art-id" [art-id]
           (do (db/delete-article art-id)
               (res/redirect "/"))))
 
@@ -44,9 +48,13 @@
       (handler request)
       (res/redirect "/admin/login"))))
 
+(defn wrap-db-initialization [handler]
+  (db/init!)
+  handler)
+
 (def app
-  (db/setup!)
-  (-> (routes (wrap-routes adm-routes wrap-adm-only)
-              app-routes)
-      (wrap-defaults site-defaults)
-      session/wrap-session))
+   (-> (routes (wrap-routes adm-routes wrap-adm-only)
+               app-routes)
+       (wrap-defaults site-defaults)
+       session/wrap-session
+       wrap-db-initialization))

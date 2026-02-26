@@ -45,6 +45,7 @@
               md/md-to-html-string)]])))
 
 (defn article [a]
+  (println a)
   (base-page
    (form/form-to
     [:delete (str "/articles/" (:id a))]
@@ -65,10 +66,10 @@
              "/articles")]
     [:div.mb-3
      (form/label "title" "Title")
-     (form/text-field {:class "form-control" "title" (:title a)})]
+     (form/text-field {:class "form-control"} "title" (:title a))]
     [:div.mb-3
      (form/label "body" "Content")
-     (form/text-field {:class "form-control" "body" (:body a)})]
+     (form/text-field {:class "form-control"} "body" (:body a))]
     (anti-forgery-field)
     (form/submit-button {:class "btn btn-primary"} "Save"))))
 

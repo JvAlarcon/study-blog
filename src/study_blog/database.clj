@@ -9,17 +9,20 @@
 (def conn (atom nil))
 (def dt-formatter (DateTimeFormatter/ofPattern "yyyy-MM-dd HH:mm:ss"))
 
-(defn setup! []
+(defn init! []
   (d/create-database db-connection-uri)
   (let [c (d/connect db-connection-uri)]
     (d/transact c schema/blog-schema)
     (reset! conn c)))
 
 (defn create-article [title body]
-  (let [dt-now (.format (LocalDateTime/now) dt-formatter)]
-    (d/transact @conn [{:blog/title title
-                        :blog/body body
-                        :blog/created-at dt-now}])))
+  (let [temp-id "new-article"
+        dt-now (.format (LocalDateTime/now) dt-formatter)
+        result @(d/transact @conn [{:db/id temp-id
+                                    :blog/title title
+                                    :blog/body body
+                                    :blog/created-at dt-now}])]
+    (get-in result [:tempids temp-id])))
 
 (def query-all-articles
   '[:find ?e ?title ?body ?created-at
@@ -32,14 +35,24 @@
   (let [db (d/db @conn)]
     (d/q query-all-articles db)))
 
-(defn get-article [id]
-  (let [db (d/db @conn)]
-    (d/pull db '[:blog/title :blog/body :blog/created-at] id)))
+(defn remove-ns-from-keys [m]
+  (update-keys m (comp keyword name)))
 
-(defn update-article [id title body]
-  (d/transact @conn [{:blog/id id
-                      :blog/title title
-                      :blog/body body}]))
+(defn get-article [str-id]
+  (let [db (d/db @conn)
+        id (parse-long str-id)]
+    (->
+     (d/pull db '[:db/id :blog/title :blog/body :blog/created-at] id)
+     remove-ns-from-keys)))
 
-(defn delete-article [id]
-  (d/transact @conn [[:db.fn/retractEntity id]]))
+(defn update-article [str-id title body]
+  (let [id (parse-long str-id)]
+    @(d/transact @conn [{:db/id id
+                         :blog/title title
+                         :blog/body body}])
+    id))
+
+(defn delete-article [str_id]
+  (let [id (parse-long str_id)]
+    @(d/transact @conn [[:db.fn/retractEntity id]])
+    id))
