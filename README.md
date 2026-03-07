@@ -1,44 +1,25 @@
-# study-blog
+# Study Blog
 
-FIXME: description
+This is a simple blog aimed to be a case study of an integration with Datomic. It's written in Clojure, and uses Datomic with PostgreSQL as storage. Utilises docker and docker-compose as the infrastructure of the blog.
 
-## Installation
+Keep in mind that to replicate this blog on your machine, it's necessary to have a Datomic licence because that licence will be configured in the `transactor.properties` file, and this template is available at the root of this repository. 
 
-Download from http://example.com/FIXME.
+On top of that, it's necessary that the Datomic Pro distribution in `.zip` format is present in the root directory of this repository on your local machine, as specified in the `Dockerfile.transactor` file. 
 
-## Usage
+Until the present moment, I couldn't make the `transactor.properties` file receive all the data configured in the `.env` file, so you need to edit both `.env` with the credentials you want and the URL of Datomic with the same credentials in the `transactor.properties` file.
 
-FIXME: explanation
+## Functionalities
 
-    $ java -jar study-blog-0.1.0-standalone.jar [args]
+Until the present moment, the main functionalities of this blog are the following:
+* Article registration
+* Article reading
+* Article editing
+* Article exclusion
 
-## Options
+## Roadmap
 
-FIXME: listing of options this app accepts.
-
-## Examples
-
-...
-
-### Bugs
-
-...
-
-### Any Other Sections
-### That You Think
-### Might be Useful
-
-## License
-
-Copyright © 2026 FIXME
-
-This program and the accompanying materials are made available under the
-terms of the Eclipse Public License 2.0 which is available at
-http://www.eclipse.org/legal/epl-2.0.
-
-This Source Code may also be made available under the following Secondary
-Licenses when the conditions for such availability set forth in the Eclipse
-Public License, v. 2.0 are satisfied: GNU General Public License as published by
-the Free Software Foundation, either version 2 of the License, or (at your
-option) any later version, with the GNU Classpath Exception which is available
-at https://www.gnu.org/software/classpath/license.html.
+Nevertheless, I want to add the following features to the blog:
+* [ ] Store the blog's administrative login data within Datomic;
+* [ ] Allow a crud of authors of articles, and create a link with articles and admin permission;
+* [ ] Add an access counter to articles;
+* [ ] List for admins the most-read articles.
