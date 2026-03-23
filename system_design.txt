@@ -1,0 +1,53 @@
+Bussiness rules:
+- The first admin is an author, and have special powers that other authors should not have
+- Only the first admin can register authors
+- Articles can be written by any author logged in
+- Articles can be accessed by anyone, even if not logged in
+- Articles can only be edited by the first admin and the author who wrote it
+- Articles can only be deleted by the first admin and the author who wrote it
+- For every access in an article, the visualization counter must increase
+- Authors need to have a view of visualization in his articles
+- [?] Authors can see the the general visualization number of all articles
+
+For schema:
+- Define a new map for article schema:
+  - It's the same as now, but instead of blog, change to article
+  - Add visualization counter, that increases for every access to the article
+  - This will affect all keys that search for blog in database.clj
+  - Remember to link article with author_id
+- Define a new map for authors schema:
+  - Need to store name of the person and e-mail. You can generate an id for it
+  - This id will be used to link with credentials
+  - There should be a field to indicate if the user is the admin or not
+- Define a new map for credentials schema:
+  - Need to store username and author_id. You can generate a an id for it
+  - This id will be used to link with password
+- Define a new map for passwords schema:
+  - Need to store credentials_id, password_hash and sa salt
+  - This schema will be consulted when a login occurs
+
+For database:
+- Create a new folder called database
+- Rename the actual database.clj to reflect articles operations
+- Create a file for authors crud operation:
+  - The first admin stored can crud other authors. The data to store will come from .env file and will occur at the initilization of the application
+  - The list of authors should be public to anyone see: Name and e-mail
+  - An author needs to have an username and password. This means that an insert with and author_id will occur in credentials, and after that an insert in passwords will occur with the credential_id
+  - Any author should see the visualization table of all articles
+- Create a file to wrap login operation:
+  - Will consult credentials and passwords
+  - Will validate the login
+
+For html:
+- Create a new folder called hmtl_pages
+- Rename the actual html_pages.clj to reflect article pages
+- Extract login page from html_pages.clj to an pages_admin.clj file
+- Create a file for author crud pages
+
+For handler:
+- Create a new folder called handler
+- Rename handler.clj to handler_main.clj or something like that
+- Maybe separate the handling by files?
+  - There will be new routes for authors
+  - I think this new routes should be on admin, because only the admin author can crud
+  - And only authors can have access to crud articles
