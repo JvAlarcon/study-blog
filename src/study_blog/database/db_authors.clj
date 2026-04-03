@@ -46,7 +46,7 @@
      (d/pull db '[:db/id :author/name :author/email :author/admin?] id)
      db-core/remove-ns-from-keys)))
 
-(defn update-author
+(defn update-author-data
   "Updates the data of an authors stored in datomic.
   Email can't be updated because it's a key.
   You can update or the admin powers alone or update the name and the admin powrs.
@@ -62,6 +62,11 @@
                                        :author/admin? admin?}])
      id)))
 
+(defn update-author-password
+  ""
+  []
+  "")
+
 (defn delete-author
   "Given an author id, delete this author from datomic.
   It will return the previous id of the deleted author"
@@ -69,29 +74,3 @@
   (let [id (parse-long str-id)]
     @(d/transact (db-core/get-conn) [[:db.fn/retractEntity id]])
     id))
-
-(def users-entity [{:db/ident :user/name
-                    :db/valueType :db.type/string
-                    :db/cardinality :db.cardinality/one
-                    :db/doc "The name of the user"}])
-
-
-(def credentials-entity [{:db/ident :credential/username
-                          :db/valueType :db.type/string
-                          :db/cardinality :db.cardinality/one
-                          :db/unique :db.unique/identity
-                          :db/doc "The username of an user and a natural key"}
-                         {:db/ident :credential/user
-                          :db/valueType :db.type/ref
-                          :db/cardinality :db.cardinality/one
-                          :db/doc "The users of this credential. Refers to user's entity"}])
-
-(def passwords-entity [{:db/ident :password/hash
-                       :db/valueType :db.type/string
-                       :db/cardinality :db.cardinality/one
-                       :db/doc "The password hash of an user"}
-                      {:db/ident :password/credential
-                       :db/valueType :db.type/ref
-                       :db/cardinality :db.cardinality/one
-                       :db/unique :db.unique/identity
-                       :db/doc "The credential of this password. Refers to credentials entity. Can only be one password per credential"}])

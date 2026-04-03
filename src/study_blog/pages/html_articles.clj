@@ -51,7 +51,7 @@
            md/md-to-html-string)]))
 
 (defn edit-article
-  "Render the creation or edit page."
+  "Render the creation or edit page of an article."
   [request a]
   (page/base-page
    request
