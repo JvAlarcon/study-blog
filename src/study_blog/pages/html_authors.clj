@@ -35,7 +35,32 @@
          "Register author"
          (register-user-form route-link))))))
 
+(defn- render-author-row
+  ""
+  [author]
+  [:tr
+   [:td (:name author)]
+   [:td (:email author)]])
+
+(defn- render-all-authors-table
+  ""
+  [authors]
+  [:table.table.table-bordered.table-hover
+   [:thead
+    [:tr
+     [:th "Name"]
+     [:th "E-mail"]
+     [:th "Actions"]]]
+   [:tbody.table-group-divider
+    (map render-author-row authors)]])
+
 (defn list-authors
   ""
   [request a]
-  )
+  (if-not a
+    (page/error-page)
+    (let [admin? (:admin? a)]
+      (page/base-page
+       request
+       "All authors"
+       (render-all-authors-table a)))))

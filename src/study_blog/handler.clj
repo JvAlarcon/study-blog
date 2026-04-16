@@ -4,15 +4,17 @@
             [ring.middleware.defaults :refer [wrap-defaults site-defaults]]
             [ring.util.response :as res]
             [ring.middleware.session :as session]
-            [study-blog.database :as db]
+            [ring.middleware.resource :refer [wrap-resource]]
+            [study-blog.database.core :as db-core]
+            [study-blog.database.db-articles :as db-articles]
             [study-blog.html-pages :as page]
             [study-blog.admin :as adm]))
 
 (defroutes app-routes
   (GET "/" []
-       (page/index (db/list-articles)))
+       (page/index (db-articles/list-articles)))
   (GET "/articles/:art-id" [art-id]
-       (page/article (db/get-article art-id)))
+       (page/article (db-articles/get-article art-id)))
   (GET "/admin/login" [:as {session :session}]
        (if (:admin session)
          (res/redirect "/")
@@ -30,16 +32,16 @@
 (defroutes adm-routes
   (GET "/articles/new" []
        (page/edit-article nil))
-  (POST "/articles" [title body]
-        (let [id (db/create-article title body)]
+  (POST "/articles" [title body author-email]
+        (let [id (db-articles/create-article title body author-email)]
           (res/redirect (str "/articles/" id))))
   (GET "/articles/:art-id/edit" [art-id]
-       (page/edit-article (db/get-article art-id)))
+       (page/edit-article (db-articles/get-article art-id)))
   (POST "/articles/:art-id" [art-id title body]
-        (do (db/update-article art-id title body)
+        (do (db-articles/update-article art-id title body)
             (res/redirect (str "/articles/" art-id))))
   (DELETE "/articles/:art-id" [art-id]
-          (do (db/delete-article art-id)
+          (do (db-articles/delete-article art-id)
               (res/redirect "/"))))
 
 (defn wrap-adm-only [handler]
@@ -49,12 +51,13 @@
       (res/redirect "/admin/login"))))
 
 (defn wrap-db-initialization [handler]
-  (db/init!)
+  (db-core/init!)
   handler)
 
 (def app
    (-> (routes (wrap-routes adm-routes wrap-adm-only)
                app-routes)
+       (wrap-resource "META-INF/resources")
        (wrap-defaults site-defaults)
        session/wrap-session
        wrap-db-initialization))

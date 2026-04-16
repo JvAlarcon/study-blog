@@ -8,7 +8,10 @@
                  [hiccup "2.0.0"]
                  [markdown-clj "1.12.4"]
                  [org.postgresql/postgresql "42.7.1"]
-                 [com.datomic/peer "1.0.7491"]]
+                 [com.datomic/peer "1.0.7491"]
+                 [org.webjars/bootstrap "5.3.8"]
+                 [org.webjars.npm/bootstrap-icons "1.13.1"]
+                 ]
   :plugins [[lein-ring "0.12.6"]]
   :ring {:handler study-blog.handler/app
          :open-browser? false}
